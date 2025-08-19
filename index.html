@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatX - Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0d0d0d;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .card {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .title {
+      font-size: 28px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #00ffe7;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-label {
+      display: block;
+      background: #333;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background 0.3s ease;
+    }
+    .upload-label:hover {
+      background: #444;
+    }
+
+    .preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+      border: 3px solid #00ffe7;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      background: #222;
+      color: #fff;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 14px 20px;
+      background: linear-gradient(90deg,#00ffe7,#007bff);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #0d0d0d;
+      font-size: 16px;
+      font-weight: bold;
+      width: 100%;
+      transition: transform 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">Welcome to ChatX</div>
+    <label class="upload-label" for="profilePic">Upload Profile Picture</label>
+    <input type="file" id="profilePic" accept="image/*">
+    <img id="preview" class="preview" src="" alt="Preview" style="display:none;">
+    <input type="text" id="username" placeholder="Enter Username">
+    <button id="startBtn" disabled>Get Started</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyC029g_8WDBRNoHbMpM0JJ_W4PzSb-bJ7U",
+      authDomain: "chatx-cfb20.firebaseapp.com",
+      databaseURL: "https://chatx-cfb20-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "chatx-cfb20",
+      storageBucket: "chatx-cfb20.appspot.com",
+      messagingSenderId: "707787260350",
+      appId: "1:707787260350:web:32d4826826d3e6ad93f9ef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+
+    // Elements
+    const profilePic = document.getElementById('profilePic');
+    const preview = document.getElementById('preview');
+    const usernameInput = document.getElementById('username');
+    const startBtn = document.getElementById('startBtn');
+
+    let file = null;
+
+    profilePic.addEventListener('change', e => {
+      file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+      validate();
+    });
+
+    usernameInput.addEventListener('input', validate);
+
+    function validate() {
+      if (usernameInput.value.trim() !== "" && file) {
+        startBtn.disabled = false;
+      } else {
+        startBtn.disabled = true;
+      }
+    }
+
+    startBtn.addEventListener('click', async () => {
+      const username = usernameInput.value.trim();
+      if (!username || !file) return;
+
+      try {
+        const userCred = await signInAnonymously(auth);
+        const uid = userCred.user.uid;
+
+        // Upload profile pic
+        const storageRef = sRef(storage, 'profiles/' + uid + '.jpg');
+        await uploadBytes(storageRef, file);
+        const photoURL = await getDownloadURL(storageRef);
+
+        // Save profile to DB
+        await set(ref(db, 'users/' + uid), {
+          username,
+          photoURL
+        });
+
+        // Redirect
+        localStorage.setItem("chatxUser", JSON.stringify({ uid, username, photoURL }));
+        window.location.href = "chatx.html";
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
