@@ -1,192 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ChatX - Welcome</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>ChatX – Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --bg: #0b0b0b;
+      --card: #151515;
+      --muted: #8b8b8b;
+      --accent: #00ffe7;
+      --accent-2: #3aa0ff;
+      --input: #1e1e1e;
+      --ring: rgba(0,255,231,0.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #0d0d0d;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1000px 600px at 80% -10%, rgba(0,255,231,0.08), transparent 60%),
+                  radial-gradient(1200px 800px at -10% 110%, rgba(58,160,255,0.08), transparent 60%), var(--bg);
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
+      display: grid;
+      place-items: center;
+      padding: 20px;
     }
-
     .card {
-      background: #1a1a1a;
-      padding: 30px;
+      width: 100%;
+      max-width: 460px;
+      background: var(--card);
+      border: 1px solid #222;
       border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
+      padding: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: pop 0.25s ease-out;
     }
-
-    .title {
-      font-size: 28px;
-      margin-bottom: 20px;
-      font-weight: bold;
-      color: #00ffe7;
+    @keyframes pop { from { transform: scale(.98); opacity: .8; } to { transform: scale(1); opacity: 1; } }
+    .title { font-weight: 800; font-size: 1.6rem; letter-spacing: .3px; }
+    .title span { color: var(--accent); }
+    .sub { color: var(--muted); margin-top: 6px; font-size: .95rem; }
+    .pfp {
+      width: 110px; height: 110px; border-radius: 999px; object-fit: cover;
+      border: 3px solid var(--accent); display: block; margin: 18px auto 10px;
+      background: #0e0e0e;
     }
-
-    input[type="file"] {
-      display: none;
+    .upload-row { display: grid; gap: 10px; grid-template-columns: 1fr auto; align-items: center; }
+    .file-btn, .btn {
+      appearance: none; border: none; cursor: pointer; border-radius: 12px; font-weight: 700;
+      padding: 12px 14px; transition: transform .08s ease, box-shadow .2s ease, opacity .2s;
     }
-
-    .upload-label {
-      display: block;
-      background: #333;
-      padding: 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      transition: background 0.3s ease;
+    .file-btn {
+      background: linear-gradient(90deg, #1f1f1f, #262626); color: #ddd; border: 1px solid #2b2b2b;
     }
-    .upload-label:hover {
-      background: #444;
+    .file-btn:hover { transform: translateY(-1px); }
+    .file-btn:active { transform: translateY(0); }
+    .btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #081016; box-shadow: 0 0 0 0 var(--ring);
     }
-
-    .preview {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 20px;
-      border: 3px solid #00ffe7;
+    .btn[disabled] { opacity: .5; cursor: not-allowed; }
+    .btn:not([disabled]):hover { transform: translateY(-1px); box-shadow: 0 0 0 6px var(--ring); }
+    .input {
+      width: 100%; background: var(--input); border: 1px solid #2b2b2b; color: #fff;
+      padding: 12px 14px; border-radius: 12px; outline: none; transition: box-shadow .2s, border-color .2s;
     }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      outline: none;
-      background: #222;
-      color: #fff;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 14px 20px;
-      background: linear-gradient(90deg,#00ffe7,#007bff);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      color: #0d0d0d;
-      font-size: 16px;
-      font-weight: bold;
-      width: 100%;
-      transition: transform 0.2s ease;
-    }
-    button:hover {
-      transform: scale(1.05);
-    }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-      color: #aaa;
-    }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 5px var(--ring); }
+    .row { margin-top: 14px; }
+    .hint { font-size: .85rem; color: var(--muted); margin-top: 8px; text-align: center; }
+    .error { margin-top: 10px; color: #ff7a7a; font-size: .9rem; min-height: 1.2em; text-align: center; }
+    .hidden { display: none; }
+    .preview-wrap { display: grid; place-items: center; margin-top: 6px; }
+    .footer { margin-top: 14px; text-align: center; font-size: .8rem; color: #7e7e7e; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="title">Welcome to ChatX</div>
-    <label class="upload-label" for="profilePic">Upload Profile Picture</label>
-    <input type="file" id="profilePic" accept="image/*">
-    <img id="preview" class="preview" src="" alt="Preview" style="display:none;">
-    <input type="text" id="username" placeholder="Enter Username">
-    <button id="startBtn" disabled>Get Started</button>
-  </div>
+  <main class="card" role="main" aria-labelledby="title">
+    <div class="title" id="title">Welcome to <span>ChatX</span></div>
+    <div class="sub">Create your anonymous profile to enter the global chat.</div>
 
-  <!-- Firebase SDK -->
+    <div class="preview-wrap">
+      <img id="preview" class="pfp hidden" alt="Profile preview" />
+    </div>
+
+    <div class="row upload-row" style="margin-top: 16px;">
+      <button id="pickBtn" class="file-btn" type="button">📷 Upload Profile Picture</button>
+      <input id="file" type="file" accept="image/*" class="hidden" />
+      <span id="fileName" style="color:#9d9d9d; font-size:.9rem;"></span>
+    </div>
+
+    <div class="row">
+      <input id="username" class="input" type="text" placeholder="Choose a username" autocomplete="nickname" />
+    </div>
+
+    <div class="row">
+      <button id="startBtn" class="btn" type="button" disabled>Get Started →</button>
+    </div>
+
+    <div id="errorBox" class="error"></div>
+    <div class="hint">By continuing, you’ll enter as an anonymous user. You can change your profile later.</div>
+    <div class="footer">Dark mode • Smooth • Realtime</div>
+  </main>
+
+  <!-- Firebase (v10 modular) -->
   <script type="module">
-    // Import Firebase
+    // ===== Firebase SDKs =====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-    // Config
+    // ===== Your config (from your message) =====
     const firebaseConfig = {
       apiKey: "AIzaSyC029g_8WDBRNoHbMpM0JJ_W4PzSb-bJ7U",
       authDomain: "chatx-cfb20.firebaseapp.com",
       databaseURL: "https://chatx-cfb20-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "chatx-cfb20",
-      storageBucket: "chatx-cfb20.appspot.com",
+      storageBucket: "chatx-cfb20.firebasestorage.app",
       messagingSenderId: "707787260350",
       appId: "1:707787260350:web:32d4826826d3e6ad93f9ef"
     };
 
+    // ===== Init =====
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    const storage = getStorage(app);
 
-    // Elements
-    const profilePic = document.getElementById('profilePic');
-    const preview = document.getElementById('preview');
-    const usernameInput = document.getElementById('username');
-    const startBtn = document.getElementById('startBtn');
+    // IMPORTANT: Explicit bucket ensures compatibility even if storageBucket domain differs
+    const storage = getStorage(app, "gs://chatx-cfb20.appspot.com");
 
-    let file = null;
+    // ===== UI Elements =====
+    const fileInput = document.getElementById("file");
+    const pickBtn = document.getElementById("pickBtn");
+    const fileName = document.getElementById("fileName");
+    const preview = document.getElementById("preview");
+    const usernameInput = document.getElementById("username");
+    const startBtn = document.getElementById("startBtn");
+    const errorBox = document.getElementById("errorBox");
 
-    profilePic.addEventListener('change', e => {
-      file = e.target.files[0];
-      if (file) {
+    let selectedFile = null;
+    let busy = false;
+
+    // Helpers
+    const setError = (msg="") => { errorBox.textContent = msg; };
+    const canContinue = () => !!(selectedFile && usernameInput.value.trim().length >= 3);
+
+    const refreshButton = () => {
+      startBtn.disabled = !canContinue() || busy;
+      startBtn.textContent = busy ? "Please wait…" : "Get Started →";
+    };
+
+    // Pick file
+    pickBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => {
+      const f = fileInput.files && fileInput.files[0];
+      selectedFile = f || null;
+      fileName.textContent = selectedFile ? selectedFile.name : "";
+      if (selectedFile) {
         const reader = new FileReader();
         reader.onload = e => {
           preview.src = e.target.result;
-          preview.style.display = 'block';
+          preview.classList.remove("hidden");
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(selectedFile);
+      } else {
+        preview.classList.add("hidden");
       }
-      validate();
+      setError("");
+      refreshButton();
     });
 
-    usernameInput.addEventListener('input', validate);
+    usernameInput.addEventListener("input", () => {
+      if (usernameInput.value.trim().length && usernameInput.value.trim().length < 3) {
+        setError("Username must be at least 3 characters.");
+      } else { setError(""); }
+      refreshButton();
+    });
 
-    function validate() {
-      if (usernameInput.value.trim() !== "" && file) {
-        startBtn.disabled = false;
-      } else {
-        startBtn.disabled = true;
+    // Main flow
+    startBtn.addEventListener("click", async () => {
+      if (!canContinue()) {
+        setError("Upload a profile picture and enter a username (min 3 chars).");
+        return;
       }
-    }
-
-    startBtn.addEventListener('click', async () => {
-      const username = usernameInput.value.trim();
-      if (!username || !file) return;
+      if (busy) return;
+      busy = true; refreshButton(); setError("");
 
       try {
-        const userCred = await signInAnonymously(auth);
-        const uid = userCred.user.uid;
+        // 1) Anonymous auth
+        const cred = await signInAnonymously(auth);
+        const uid = cred.user.uid;
 
-        // Upload profile pic
-        const storageRef = sRef(storage, 'profiles/' + uid + '.jpg');
-        await uploadBytes(storageRef, file);
-        const photoURL = await getDownloadURL(storageRef);
+        // 2) Upload avatar
+        const avatarRef = sRef(storage, `profiles/${uid}.jpg`);
+        await uploadBytes(avatarRef, selectedFile);
+        const photoURL = await getDownloadURL(avatarRef);
 
-        // Save profile to DB
-        await set(ref(db, 'users/' + uid), {
+        // 3) Save profile
+        const username = usernameInput.value.trim();
+        await set(ref(db, `users/${uid}`), {
           username,
-          photoURL
+          photoURL,
+          createdAt: Date.now()
         });
 
-        // Redirect
+        // 4) Persist locally & go
         localStorage.setItem("chatxUser", JSON.stringify({ uid, username, photoURL }));
         window.location.href = "chatx.html";
       } catch (err) {
-        alert("Error: " + err.message);
+        console.error(err);
+        // Friendly messages for common causes
+        if (String(err?.message || "").includes("storage")) {
+          setError("Storage error. If it persists, enable Firebase Storage for your project and allow anonymous reads/writes via security rules.");
+        } else if (String(err?.message || "").includes("auth")) {
+          setError("Auth error. Make sure Anonymous Sign-in is enabled in Firebase Authentication.");
+        } else if (String(err?.message || "").includes("permission") || String(err?.message || "").includes("rules")) {
+          setError("Permission denied. Check your Realtime Database & Storage security rules.");
+        } else {
+          setError(err.message || "Something went wrong.");
+        }
+      } finally {
+        busy = false; refreshButton();
       }
     });
+
+    // Quality-of-life: support pressing Enter to submit if both fields are valid
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && canContinue() && !busy) startBtn.click();
+    });
+
   </script>
 </body>
 </html>
